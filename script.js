@@ -13,15 +13,26 @@ function main() {
 
   d3.json("data.json", function(data) {
     var parseTime = d3.timeParse("%Y-%m-%d %H:%M");
-
+    var parseDay = d3.timeParse("%e %b %Y");
+    var formatDay = d3.timeFormat("%e %b %Y");
     data.forEach(function(d) {
-        d.mouseoverDisplay = parseTime(d.date);
         d.date = parseTime(d.date);
         d.end = parseTime(d.end);
         d.duration = ((d.end - d.date) / (60 * 1000) / 60); // session duration in minutes
         d.starttime = d.date.getHours();
         d.endtime = d.end.getHours();
-        // d.date = d.date.getDay();
+        // d.day = d3.timeDay(d.date);
+        d.daily = formatDay(d.date);
+        d.day = parseDay(d.daily);
+        // console.log("d.day = " + d.day);
+
+        // var formatMonth = d3.timeFormat("%B"),
+        // formatDay = d3.timeFormat("%A"),
+        // date = new Date(2014, 4, 1); // Thu May 01 2014 00:00:00 GMT-0700 (PDT)
+        // %e %b
+        // formatMonth(date); // "May"
+        // formatDay(date); // "Thursday"
+
         return d;
       },
       function(error, data) {
@@ -30,7 +41,7 @@ function main() {
 
     var x = d3.scaleTime()
       .domain(d3.extent(data, function(d) {
-        return d.date; //need to round to day
+        return d.day; //need to round to day
       }))
       .range([0, width]);
 
@@ -48,7 +59,7 @@ function main() {
       .attr("class", "bar")
       .attr("transform", "translate(80,0)")
       .attr("x", function(d) {
-        return x(d.date);
+        return x(d.day);
       })
       .attr("y", function(d) {
         return y(d.endtime);
@@ -61,7 +72,8 @@ function main() {
     svg.append("g")
       .attr("class", "axis axis--x")
       .attr("transform", "translate(80," + (height + 2) + ")")
-      .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%e %b")))
+      .call(d3.axisBottom(x).ticks(d3.timeDay.every(1)).tickFormat(d3.timeFormat("%e %b %Y")))
+      // axis.ticks(d3.timeMinute.every(15));
       // .call(d3.axisBottom(x))
       .selectAll("text")
       .style("text-anchor", "end")
