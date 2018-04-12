@@ -11,14 +11,8 @@ function main() {
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom;
 
-
-  d3.json("dataTest.json", function(data) {
+  d3.json("data.json", function(data) {
     var parseTime = d3.timeParse("%Y-%m-%d %H:%M");
-
-    // function parse_for_week(date) {
-    //   return formatDate.parse(date).getDay();
-    // }
-
 
     data.forEach(function(d) {
         d.mouseoverDisplay = parseTime(d.date);
