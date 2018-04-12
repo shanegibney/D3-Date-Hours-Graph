@@ -21,7 +21,7 @@ function main() {
         d.duration = ((d.end - d.date) / (60 * 1000) / 60); // session duration in minutes
         d.starttime = d.date.getHours();
         d.endtime = d.end.getHours();
-        d.date = d.date.getDay();
+        // d.date = d.date.getDay();
         return d;
       },
       function(error, data) {
