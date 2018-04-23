@@ -10,25 +10,31 @@ function main() {
     },
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom;
+  var color = ["#2C93E8", "#838690", "#F56C4E", "#A60F2B", "#648C85", "#B3F2C9", "#528C18", "#C3F25C"];
 
   d3.json("data.json", function(data) {
     var parseTime = d3.timeParse("%Y-%m-%d %H:%M");
     var parseDay = d3.timeParse("%e %b %Y");
     var formatDay = d3.timeFormat("%e %b %Y");
     data.forEach(function(d) {
-      d.commence = parseTime(d.start);
-      d.conclude = parseTime(d.end);
-      if (d.commence.getDay() != d.conclude.getDay()) {
+      commence = parseTime(d.start);
+      conclude = parseTime(d.end);
+      if (commence.getDay() != conclude.getDay()) {
         // a check here in case they are more than a day apart
-        midnight = d.commence.getFullYear() + "-" + d.commence.getMonth() + "-" + d.commence.getDay() + " 24:00";
-        morning = d.conclude.getFullYear() + "-" + d.conclude.getMonth() + "-" + d.conclude.getDay() + " 00:00";
+        // 2016-11-04 12:00
+
+        midnight = commence.getFullYear() + "-" + commence.getMonth() + "-" + commence.getDay() + " 24:00";
+        console.log("midnight is " + midnight);
+        d.end = midnight;
+        morning = conclude.getFullYear() + "-" + conclude.getMonth() + "-" + conclude.getDay() + " 00:00";
+        console.log("morning is " + morning);
         data.push({
-          "start": d.start,
-          "end": midnight
-        }, {
           "start": morning,
           "end": d.end
         })
+        //we need to remove current object
+        //what element in the array is it, read the 'i'
+        //use slice to remove that element data.slice(i,1) or soemthing like that
       }
     });
     console.log(JSON.stringify(data, null, 2));
@@ -47,6 +53,8 @@ function main() {
       function(error, data) {
         if (error) throw error;
       });
+
+    document.getElementById("json").innerHTML = "<h5>data.json</h5>" + "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
 
     var x = d3.scaleTime()
       .domain(d3.extent(data, function(d) {
@@ -72,18 +80,18 @@ function main() {
       })
       .attr("y", function(d) {
         //if ((d.endtime + d.duration) > 24) {
-        console.log("oh no:")
-        console.log("d.starttime: " + d.starttime); //2
-        console.log("y(d.starttime): " + y(d.starttime)); //293.3333
-        console.log("d.endtime: " + d.endtime); //18
-        console.log("y(d.endtime): " + y(d.endtime)); //80
-        console.log("d.duration: " + d.duration); //16
-        console.log("y(d.duration): " + y(d.duration)); //106.6666
-        console.log("height: " + height); //320
-        console.log("y(16): " + y(16)); //106.6666
-        console.log("y(24): " + y(24)); //0
-        console.log("y(0): " + y(0)); //320
-        console.log("height - y(d.duration): " + (height - y(d.duration))); //320-106.666=213.333
+        // console.log("oh no:")
+        // console.log("d.starttime: " + d.starttime); //2
+        // console.log("y(d.starttime): " + y(d.starttime)); //293.3333
+        // console.log("d.endtime: " + d.endtime); //18
+        // console.log("y(d.endtime): " + y(d.endtime)); //80
+        // console.log("d.duration: " + d.duration); //16
+        // console.log("y(d.duration): " + y(d.duration)); //106.6666
+        // console.log("height: " + height); //320
+        // console.log("y(16): " + y(16)); //106.6666
+        // console.log("y(24): " + y(24)); //0
+        // console.log("y(0): " + y(0)); //320
+        // console.log("height - y(d.duration): " + (height - y(d.duration))); //320-106.666=213.333
         //  }
         return y(d.endtime);
       })
@@ -92,6 +100,9 @@ function main() {
         return height - y(d.duration);
         // return y(d.starttime);
       })
+      .style("fill", function(d, i) {
+        return color[i];
+      });
 
     svg.append("g")
       .attr("class", "axis axis--x")
