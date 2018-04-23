@@ -23,15 +23,15 @@ function main() {
         // a check here in case they are more than a day apart
         // 2016-11-04 12:00
 
-        midnight = commence.getFullYear() + "-" + commence.getMonth() + "-" + commence.getDay() + " 24:00";
-        console.log("midnight is " + midnight);
-        d.end = midnight;
-        morning = conclude.getFullYear() + "-" + conclude.getMonth() + "-" + conclude.getDay() + " 00:00";
+        morning = conclude.getFullYear() + "-" + (conclude.getMonth() + 1) + "-" + conclude.getDate() + " 00:00";
         console.log("morning is " + morning);
         data.push({
           "start": morning,
           "end": d.end
         })
+        midnight = commence.getFullYear() + "-" + (commence.getMonth() + 1) + "-" + commence.getDate() + " 23:59";
+        console.log("midnight is " + midnight);
+        d.end = midnight;
         //we need to remove current object
         //what element in the array is it, read the 'i'
         //use slice to remove that element data.slice(i,1) or soemthing like that
