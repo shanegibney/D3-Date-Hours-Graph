@@ -19,6 +19,7 @@ function main() {
       d.commence = parseTime(d.start);
       d.conclude = parseTime(d.end);
       if (d.commence.getDay() != d.conclude.getDay()) {
+        // a check here in case they are more than a day apart
         midnight = d.commence.getFullYear() + "-" + d.commence.getMonth() + "-" + d.commence.getDay() + " 24:00";
         morning = d.conclude.getFullYear() + "-" + d.conclude.getMonth() + "-" + d.conclude.getDay() + " 00:00";
         data.push({
@@ -30,6 +31,7 @@ function main() {
         })
       }
     });
+    console.log(JSON.stringify(data, null, 2));
 
     data.forEach(function(d) {
         d.start = parseTime(d.start);
@@ -39,8 +41,6 @@ function main() {
         d.endtime = d.end.getHours();
         d.daily = formatDay(d.start);
         d.day = parseDay(d.daily);
-        console.log("d.start: " + d.start);
-        console.log("d.end: " + d.end);
 
         return d;
       },
