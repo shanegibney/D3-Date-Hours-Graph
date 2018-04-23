@@ -16,22 +16,31 @@ function main() {
     var parseDay = d3.timeParse("%e %b %Y");
     var formatDay = d3.timeFormat("%e %b %Y");
     data.forEach(function(d) {
-        d.date = parseTime(d.date);
-        d.end = parseTime(d.end);
-        d.duration = ((d.end - d.date) / (60 * 1000) / 60); // session duration in minutes
-        d.starttime = d.date.getHours();
-        d.endtime = d.end.getHours();
-        // d.day = d3.timeDay(d.date);
-        d.daily = formatDay(d.date);
-        d.day = parseDay(d.daily);
-        // console.log("d.day = " + d.day);
+      d.commence = parseTime(d.start);
+      d.conclude = parseTime(d.end);
+      if (d.commence.getDay() != d.conclude.getDay()) {
+        midnight = d.commence.getFullYear() + "-" + d.commence.getMonth() + "-" + d.commence.getDay() + " 24:00";
+        morning = d.conclude.getFullYear() + "-" + d.conclude.getMonth() + "-" + d.conclude.getDay() + " 00:00";
+        data.push({
+          "start": d.start,
+          "end": midnight
+        }, {
+          "start": morning,
+          "end": d.end
+        })
+      }
+    });
 
-        // var formatMonth = d3.timeFormat("%B"),
-        // formatDay = d3.timeFormat("%A"),
-        // date = new Date(2014, 4, 1); // Thu May 01 2014 00:00:00 GMT-0700 (PDT)
-        // %e %b
-        // formatMonth(date); // "May"
-        // formatDay(date); // "Thursday"
+    data.forEach(function(d) {
+        d.start = parseTime(d.start);
+        d.end = parseTime(d.end);
+        d.duration = ((d.end - d.start) / (60 * 1000) / 60); // session duration in hours
+        d.starttime = d.start.getHours();
+        d.endtime = d.end.getHours();
+        d.daily = formatDay(d.start);
+        d.day = parseDay(d.daily);
+        console.log("d.start: " + d.start);
+        console.log("d.end: " + d.end);
 
         return d;
       },
@@ -59,19 +68,34 @@ function main() {
       .attr("class", "bar")
       .attr("transform", "translate(80,0)")
       .attr("x", function(d) {
-        return x(d.day);
+        return x(d.day) + 10;
       })
       .attr("y", function(d) {
+        //if ((d.endtime + d.duration) > 24) {
+        console.log("oh no:")
+        console.log("d.starttime: " + d.starttime); //2
+        console.log("y(d.starttime): " + y(d.starttime)); //293.3333
+        console.log("d.endtime: " + d.endtime); //18
+        console.log("y(d.endtime): " + y(d.endtime)); //80
+        console.log("d.duration: " + d.duration); //16
+        console.log("y(d.duration): " + y(d.duration)); //106.6666
+        console.log("height: " + height); //320
+        console.log("y(16): " + y(16)); //106.6666
+        console.log("y(24): " + y(24)); //0
+        console.log("y(0): " + y(0)); //320
+        console.log("height - y(d.duration): " + (height - y(d.duration))); //320-106.666=213.333
+        //  }
         return y(d.endtime);
       })
       .attr("width", 20)
       .attr("height", function(d) {
         return height - y(d.duration);
+        // return y(d.starttime);
       })
 
     svg.append("g")
       .attr("class", "axis axis--x")
-      .attr("transform", "translate(80," + (height + 2) + ")")
+      .attr("transform", "translate(100," + (height + 2) + ")")
       .call(d3.axisBottom(x).ticks(d3.timeDay.every(1)).tickFormat(d3.timeFormat("%e %b %Y")))
       // axis.ticks(d3.timeMinute.every(15));
       // .call(d3.axisBottom(x))
